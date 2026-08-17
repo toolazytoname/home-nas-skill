@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>home-nas 体系架构</title>
+  <style>
+    :root {
+      --bg: #12110f;
+      --ink: #f4efe6;
+      --muted: #b7aea0;
+      --line: rgba(244, 239, 230, 0.12);
+      --card: #1b1916;
+      --amber: #e2a24a;
+      --amber-soft: rgba(226, 162, 74, 0.16);
+      --green: #7dba7a;
+      --blue: #7ea8d6;
+      --rose: #d48b84;
+      --violet: #b39ad6;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Source Han Sans SC", sans-serif;
+    }
+    body {
+      width: 1600px;
+      padding: 48px 56px 56px;
+    }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 28px;
+    }
+    .kicker {
+      letter-spacing: 0.22em;
+      font-size: 13px;
+      color: var(--amber);
+      text-transform: uppercase;
+      margin: 0 0 8px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 42px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .sub {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 18px;
+    }
+    .badge {
+      border: 1px solid var(--line);
+      background: var(--card);
+      padding: 14px 18px;
+      border-radius: 14px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      max-width: 420px;
+      text-align: right;
+    }
+    .badge strong { color: var(--ink); font-weight: 600; }
+    .section {
+      margin-top: 22px;
+    }
+    .label {
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .row {
+      display: grid;
+      gap: 14px;
+    }
+    .row.access { grid-template-columns: 1.1fr 0.7fr 1.2fr 1fr; }
+    .row.lanes { grid-template-columns: 1.45fr 0.85fr 0.85fr 0.85fr; }
+    .row.ops { grid-template-columns: 1.1fr 1.1fr 0.8fr; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      min-height: 148px;
+    }
+    .card h3 {
+      margin: 0 0 12px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      padding: 3px 8px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+    .tag.amber { color: var(--amber); background: var(--amber-soft); }
+    .tag.blue { color: var(--blue); background: rgba(126,168,214,.16); }
+    .tag.green { color: var(--green); background: rgba(125,186,122,.16); }
+    .tag.rose { color: var(--rose); background: rgba(212,139,132,.16); }
+    .tag.violet { color: var(--violet); background: rgba(179,154,214,.16); }
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .node {
+      background: #26231f;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+    .node small {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 2px;
+    }
+    .arrow {
+      color: var(--amber);
+      font-size: 16px;
+      padding: 0 2px;
+    }
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    ul b { color: var(--ink); font-weight: 600; }
+    .note {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .night {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .slot {
+      background: #26231f;
+      border-radius: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+    }
+    .slot time {
+      display: block;
+      color: var(--amber);
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .slot span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .foot {
+      margin-top: 22px;
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <div>
+      <p class="kicker">home-nas skill</p>
+      <h1>一台旧小主机上的家庭媒体中心</h1>
+      <p class="sub">影视自动入库 · 相册私有云 · 音乐有声书 · 书库 · 去广告 · 夜间备份</p>
+    </div>
+    <div class="badge">
+      参考实机 <strong>HPE MicroServer Gen10</strong><br>
+      AMD Opteron X3216 · 8GB · 双 10TB · Debian 12<br>
+      23 个常驻容器 · 局域网 <strong>http://nas.local</strong>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="label">01  怎么进来</div>
+    <div class="row access">
+      <div class="card">
+        <span class="tag amber">家里</span>
+        <h3>手机 / 电脑 / 电视</h3>
+        <div class="flow">
+          <div class="node">浏览器打开<br><small>http://nas.local</small></div>
+          <div class="arrow">→</div>
+          <div class="node">Caddy :80<br><small>反代导航页</small></div>
+        </div>
+        <p class="note">Avahi/mDNS 发布主机名，不必改路由器 DNS。</p>
+      </div>
+      <div class="card">
+        <span class="tag amber">入口</span>
+        <h3>Heimdall</h3>
+        <ul>
+          <li><b>影音</b> 看、听、读</li>
+          <li><b>追剧流水线</b> 搜、下、字幕</li>
+          <li><b>相册</b> Immich</li>
+          <li><b>管理</b> 监控与运维</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="tag blue">出门</span>
+        <h3>只走 Tailscale</h3>
+        <ul>
+          <li>不映射公网 80 / 443</li>
+          <li>NAT 穿透，免费，零端口转发</li>
+          <li>NAS 关机只是入口打不开，不影响全家上网</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="tag green">网络卫生</span>
+        <h3>AdGuard Home</h3>
+        <ul>
+          <li>家里设备把 DNS 指过来</li>
+          <li>拦截广告与恶意域名</li>
+          <li>上游用国内 DoH</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="label">02  四条内容线</div>
+    <div class="row lanes">
+      <div class="card">
+        <span class="tag amber">影音主线</span>
+        <h3>想看的剧，自己会出现在电视上</h3>
+        <div class="flow">
+          <div class="node">Prowlarr<small>索引器 + FlareSolverr</small></div>
+          <div class="arrow">→</div>
+          <div class="node">Sonarr / Radarr<small>剧集 / 电影 / 番剧</small></div>
+          <div class="arrow">→</div>
+          <div class="node">qBittorrent<small>下载到 /downloads</small></div>
+          <div class="arrow">→</div>
+          <div class="node">硬链接入库<small>/movies /tv /anime</small></div>
+          <div class="arrow">→</div>
+          <div class="node">Bazarr<small>中文字幕多源</small></div>
+          <div class="arrow">→</div>
+          <div class="node">Jellyfin<small>刮削 + 1080p 直放</small></div>
+        </div>
+        <p class="note">弱 CPU 铁律：质量锁 HD-1080p，禁止 4K / REMUX。电视不认 TrueHD 就会逼 NAS 转码。</p>
+      </div>
+      <div class="card">
+        <span class="tag rose">相册</span>
+        <h3>Immich 私有相册</h3>
+        <ul>
+          <li>手机自动备份，数据在家里</li>
+          <li>人脸 / 智能搜索交给夜间 ML</li>
+          <li>每日 rsync + pg_dump 到第二块盘</li>
+          <li><b>全家唯一不可再生数据</b></li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="tag violet">听</span>
+        <h3>Navidrome + 有声书</h3>
+        <ul>
+          <li>Navidrome 扫本地音乐库</li>
+          <li>Subsonic 客户端随地听</li>
+          <li>Audiobookshelf 管有声书 / 播客</li>
+          <li>扫描调度写在 navidrome.toml</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="tag blue">读</span>
+        <h3>TaleBook 书库</h3>
+        <ul>
+          <li>底层是 Calibre</li>
+          <li>网页上传或 scp 进 imports/</li>
+          <li>手机阅读器走 OPDS，URL 末尾必须 /opds/</li>
+          <li>豆瓣元数据旁路补全</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="label">03  弱机器也能稳：资源、监控、夜里自己干活</div>
+    <div class="row ops">
+      <div class="card">
+        <span class="tag amber">8GB 内存纪律</span>
+        <h3>给容器戴帽子，留给页缓存</h3>
+        <ul>
+          <li>Jellyfin / Immich Server 1.5G</li>
+          <li>Immich ML 2G · Postgres 1G</li>
+          <li>qB 768M · *arr / Bazarr 512M</li>
+          <li>Prowlarr 384M · 约 2G 留给 Linux 缓存</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="tag green">健康看板</span>
+        <h3>Scrutiny · Uptime Kuma · Portainer</h3>
+        <ul>
+          <li>Scrutiny 看 SMART：待映射扇区增长就换盘</li>
+          <li>Uptime Kuma 盯服务存活，可接微信</li>
+          <li>Portainer 管容器，Home Assistant 管家</li>
+          <li>百度网盘 / OneIndex 作云盘旁路</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="tag rose">夜间值班</span>
+        <h3>systemd timer</h3>
+        <div class="night">
+          <div class="slot"><time>01:00</time><span>拉起 Immich ML</span></div>
+          <div class="slot"><time>02:30</time><span>停 ML，省 1.1G</span></div>
+          <div class="slot"><time>03:00</time><span>整机配置 + 照片备份</span></div>
+          <div class="slot"><time>全天</time><span>广告拦截 + 监控</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <div>大陆环境：ghcr.nju.edu.cn / docker.1ms.run · Jellyfin 必须带代理才能刮 TMDB</div>
+    <div>backup 优先级：照片库 + 照片数据库 &gt; 服务配置 &gt; 影视库（可重下）</div>
+  </div>
+</body>
+</html>
