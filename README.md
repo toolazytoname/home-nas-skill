@@ -209,7 +209,21 @@ ML 用 systemd timer：每天 01:00 启动，02:30 停掉，大约省 1.1 G 常�
 
 ---
 
-## 把手册交给 AI
+## 把手册交给 AI，在另一台机器上再搭一套
+
+这份仓库是 **Skill（给 AI 的操作手册）**，不是安装包。合理预期是：
+
+| 能很容易复刻 | 不能一键克隆 |
+|---|---|
+| 搭建顺序、弱 CPU 取舍、大陆镜像和代理 | 你已经下好的片、Immich 照片库 |
+| *arr → qB → 字幕 → Jellyfin 这条主线 | 索引器账号、Cookie、API key |
+| 内存上限、夜间 ML、备份优先级 | 现机上的密码和私人配置 |
+| 刮削失败、不下片、进不了库这类坑 | 把 23 个容器一次 `compose up` 还原 |
+
+宣传时可以说：**按这份 Skill，能在另一台旧电脑上复刻同一套家庭媒体中心。**  
+不要说「一键恢复我的 NAS」。
+
+### 装到 Claude / Codex / Cursor
 
 ```bash
 mkdir -p ~/.claude/skills/home-nas
@@ -217,16 +231,33 @@ curl -fsSL https://raw.githubusercontent.com/toolazytoname/home-nas-skill/main/S
   -o ~/.claude/skills/home-nas/SKILL.md
 ```
 
-Codex / Cursor / 其他能读 `SKILL.md` 的工具，把同一份文件放到对应 skills 目录即可。
+其他能读 `SKILL.md` 的工具，把同一份放到对应 skills 目录。让 AI **能 SSH 上那台新机器**，否则它只能口头讲，动不了手。
 
-之后可以直接说：
+### 从零重搭，可以这么说
 
-- 「按 home-nas 这套手册，在这台旧电脑上搭家庭媒体中心」
-- 「Jellyfin 不刮削了，日志也没报错」
-- 「Sonarr 搜到了但不下载」
-- 「下载完进不了媒体库」
-- 「小米电视播 4K 卡死」
-- 「给 Immich 加上夜间 ML 定时启停和每日备份」
+把硬件那一行改成新机器的实情，整段丢给 AI：
+
+```text
+按 home-nas 这套手册，在这台机器上从零搭家庭媒体中心。
+硬件是：CPU ___，内存 ___，磁盘 ___。系统是 Debian，我有 sudo，网络在中国大陆。
+严格按 SKILL 的顺序来：先 Docker 和盘，再 qB → Prowlarr → Sonarr/Radarr → Bazarr → Jellyfin，
+质量锁 HD-1080p，禁止 4K。
+Jellyfin 必须带 HTTP 代理才能刮 TMDB。镜像用 ghcr.nju.edu.cn / docker.1ms.run。
+每做完一步停下来给我看，别一次铺 20 个容器。
+先把影视主线跑通，相册、音乐、书库、备份下一轮再加。
+```
+
+只想看电视、机器更弱，把「先把影视主线跑通」留着，后面的服务删掉即可。
+
+### 已经搭好了，排障这么说
+
+- 「按 home-nas：Jellyfin 不刮削，日志几乎没报错」
+- 「按 home-nas：Sonarr 搜到了但不下载」
+- 「按 home-nas：下载完进不了媒体库」
+- 「按 home-nas：小米电视播 4K 卡死」
+- 「按 home-nas：给 Immich 加上夜间 ML 定时启停和每日备份」
+
+先点名手册，AI 才会走这套已经踩过的坑，而不是另开一套「标准 homelab」。
 
 ---
 
