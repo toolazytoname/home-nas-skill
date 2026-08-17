@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="docs/images/hero.jpg" alt="客厅电视柜里的家庭 NAS，电视正在播放影片" />
-</p>
-
 <h1 align="center">home-nas</h1>
 
 <p align="center">
@@ -16,6 +12,10 @@
   <img alt="skill" src="https://img.shields.io/badge/Claude%20Code-Skill-d97706?style=flat-square" />
 </p>
 
+<p align="center">
+  <img src="docs/images/architecture.png" alt="home-nas 体系架构：入口、四条内容线、资源限制与夜间值班" />
+</p>
+
 这个仓库是一份可以丢给 Claude Code / Codex / Cursor 的 **Skill**：你对着 AI 说「帮我搭家庭 NAS」「Jellyfin 不刮削了」，它按这套已经踩过坑的手册来，而不是再从零搜一遍英文博客。
 
 手册提炼自一台还在服役的机器，不是演示环境。
@@ -23,10 +23,6 @@
 ---
 
 ## 这台参考机现在在干什么
-
-<p align="center">
-  <img src="docs/images/hardware.jpg" width="520" alt="双盘位小主机产品静物" />
-</p>
 
 | | 实机 |
 |---|---|
@@ -99,11 +95,7 @@ Remote path mapping 一定要配。硬链接不能跨盘；下载盘和媒体库
 
 ---
 
-## 一张图看懂这套体系
-
-<p align="center">
-  <img src="docs/images/architecture.png" alt="home-nas 体系架构：入口、四条内容线、资源限制与夜间值班" />
-</p>
+## 体系速记
 
 ```text
 家里:  手机 / 电脑 / 电视  →  http://nas.local  →  Caddy :80  →  Heimdall
